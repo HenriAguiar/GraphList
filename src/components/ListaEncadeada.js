@@ -129,10 +129,10 @@ const ListaEncadeada = () => {
 
   return (
     <div>
-      <button onClick={addNode} style={{ marginRight: 10 }}>
+      <button onClick={addNode} style={{ marginRight: 10 }} type="button" class="btn btn-primary">
         Adicionar Nó
       </button>
-      <button onClick={removeNode}>Remover Nó</button>
+      <button type="button" class="btn btn-danger" onClick={removeNode}>Remover Nó</button>
       <div
         ref={svgContainer}
         style={{
