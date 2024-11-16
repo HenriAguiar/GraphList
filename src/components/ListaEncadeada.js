@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { SVG } from "@svgdotjs/svg.js";
 
@@ -94,11 +94,7 @@ const ListaEncadeada = () => {
 
     // Atualizar o estado do nó removido
     setNodes((prevNodes) =>
-      prevNodes.map((node, index) =>
-        index === nodeIndex
-          ? { ...node, removed: true } // Marcar como removido
-          : node
-      )
+      prevNodes.filter((_, index) => index !== nodeIndex)
     );
   };
 
@@ -128,17 +124,45 @@ const ListaEncadeada = () => {
   };
 
   return (
-    <div>
-      <button onClick={addNode} style={{ marginRight: 10 }} type="button" class="btn btn-primary">
-        Adicionar Nó
-      </button>
-      <button type="button" class="btn btn-danger" onClick={removeNode}>Remover Nó</button>
+    <div style={{ textAlign: "center" }}>
+      <div style={{ marginBottom: 20 }}>
+        <button
+          onClick={addNode}
+          style={{
+            padding: "10px 20px",
+            marginRight: 10,
+            backgroundColor: "#4CAF50",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Adicionar Nó
+        </button>
+        <button
+          onClick={removeNode}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#f44336",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Remover Nó
+        </button>
+      </div>
       <div
         ref={svgContainer}
         style={{
           border: "1px solid #ccc",
-          marginTop: 20,
+          margin: "20px auto",
+          width: "80%",
           height: 300,
+          borderRadius: "10px",
+          backgroundColor: "#f9f9f9",
         }}
       ></div>
     </div>
