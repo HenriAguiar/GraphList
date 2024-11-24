@@ -1,10 +1,7 @@
-// ListaComandos.g4
 grammar ListaComandos;
 
-// A regra de início
 commands: command* EOF;
 
-// Definição de um comando
 command
     : inserir_inicioCommand
     | inserir_fimCommand
@@ -15,63 +12,36 @@ command
     | remover_posicaoCommand
     ;
 
-// Comandos de Inserção
-inserir_inicioCommand
-    : 'inserir_inicio' '(' valor ')' ';'
-    ;
+inserir_inicioCommand: INSERIR_INICIO LPAREN valor RPAREN SEMICOLON;
+inserir_fimCommand: INSERIR_FIM LPAREN valor RPAREN SEMICOLON;
+inserir_aposCommand: INSERIR_APOS LPAREN valor COMMA valor RPAREN SEMICOLON;
+remover_inicioCommand: REMOVER_INICIO LPAREN RPAREN SEMICOLON;
+remover_fimCommand: REMOVER_FIM LPAREN RPAREN SEMICOLON;
+remover_elementoCommand: REMOVER_ELEMENTO LPAREN valor RPAREN SEMICOLON;
+remover_posicaoCommand: REMOVER_POSICAO LPAREN posicao RPAREN SEMICOLON;
 
-inserir_fimCommand
-    : 'inserir_fim' '(' valor ')' ';'
-    ;
+valor: IDENTIFIER | NUMBER | STRING;
+posicao: NUMBER;
 
-inserir_aposCommand
-    : 'inserir_apos' '(' valor ',' valor ')' ';'
-    ;
+// Tokens para os literais
+INSERIR_INICIO: 'inserir_inicio';
+INSERIR_FIM: 'inserir_fim';
+INSERIR_APOS: 'inserir_apos';
+REMOVER_INICIO: 'remover_inicio';
+REMOVER_FIM: 'remover_fim';
+REMOVER_ELEMENTO: 'remover_elemento';
+REMOVER_POSICAO: 'remover_posicao';
 
-// Comandos de Remoção
-remover_inicioCommand
-    : 'remover_inicio' '(' ')' ';'
-    ;
+// Tokens para símbolos e palavras reservadas
+LPAREN: '(';
+RPAREN: ')';
+COMMA: ',';
+SEMICOLON: ';';
 
-remover_fimCommand
-    : 'remover_fim' '(' ')' ';'
-    ;
+// Tokens para valores
+IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*;
+NUMBER: [0-9]+;
+STRING: '"' .*? '"';
 
-remover_elementoCommand
-    : 'remover_elemento' '(' valor ')' ';'
-    ;
-
-remover_posicaoCommand
-    : 'remover_posicao' '(' posicao ')' ';'
-    ;
-
-// Definição de valor (pode ser um identificador, número ou string)
-valor
-    : IDENTIFIER
-    | NUMBER
-    | STRING
-    ;
-
-// Definição de posição (número inteiro)
-posicao
-    : NUMBER
-    ;
-
-// Definição de tokens
-
-IDENTIFIER
-    : [a-zA-Z_][a-zA-Z0-9_]*
-    ;
-
-NUMBER
-    : [0-9]+
-    ;
-
-STRING
-    : '"' (~["\r\n])* '"'
-    ;
-
-// Ignorar espaços em branco, tabulações e quebras de linha
-WS
-    : [ \t\r\n]+ -> skip
-    ;
+// Ignorar espaços em branco
+WS: [ \t\r\n]+ -> skip;

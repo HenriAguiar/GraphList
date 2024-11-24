@@ -28,17 +28,17 @@ import { ListaComandosVisitor } from "./ListaComandosVisitor";
 
 
 export class ListaComandosParser extends Parser {
-	public static readonly T__0 = 1;
-	public static readonly T__1 = 2;
-	public static readonly T__2 = 3;
-	public static readonly T__3 = 4;
-	public static readonly T__4 = 5;
-	public static readonly T__5 = 6;
-	public static readonly T__6 = 7;
-	public static readonly T__7 = 8;
-	public static readonly T__8 = 9;
-	public static readonly T__9 = 10;
-	public static readonly T__10 = 11;
+	public static readonly INSERIR_INICIO = 1;
+	public static readonly INSERIR_FIM = 2;
+	public static readonly INSERIR_APOS = 3;
+	public static readonly REMOVER_INICIO = 4;
+	public static readonly REMOVER_FIM = 5;
+	public static readonly REMOVER_ELEMENTO = 6;
+	public static readonly REMOVER_POSICAO = 7;
+	public static readonly LPAREN = 8;
+	public static readonly RPAREN = 9;
+	public static readonly COMMA = 10;
+	public static readonly SEMICOLON = 11;
 	public static readonly IDENTIFIER = 12;
 	public static readonly NUMBER = 13;
 	public static readonly STRING = 14;
@@ -62,13 +62,14 @@ export class ListaComandosParser extends Parser {
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
-		undefined, "'inserir_inicio'", "'('", "')'", "';'", "'inserir_fim'", "'inserir_apos'", 
-		"','", "'remover_inicio'", "'remover_fim'", "'remover_elemento'", "'remover_posicao'",
+		undefined, "'inserir_inicio'", "'inserir_fim'", "'inserir_apos'", "'remover_inicio'", 
+		"'remover_fim'", "'remover_elemento'", "'remover_posicao'", "'('", "')'", 
+		"','", "';'",
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, "IDENTIFIER", "NUMBER", 
-		"STRING", "WS",
+		undefined, "INSERIR_INICIO", "INSERIR_FIM", "INSERIR_APOS", "REMOVER_INICIO", 
+		"REMOVER_FIM", "REMOVER_ELEMENTO", "REMOVER_POSICAO", "LPAREN", "RPAREN", 
+		"COMMA", "SEMICOLON", "IDENTIFIER", "NUMBER", "STRING", "WS",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(ListaComandosParser._LITERAL_NAMES, ListaComandosParser._SYMBOLIC_NAMES, []);
 
@@ -107,7 +108,7 @@ export class ListaComandosParser extends Parser {
 			this.state = 25;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << ListaComandosParser.T__0) | (1 << ListaComandosParser.T__4) | (1 << ListaComandosParser.T__5) | (1 << ListaComandosParser.T__7) | (1 << ListaComandosParser.T__8) | (1 << ListaComandosParser.T__9) | (1 << ListaComandosParser.T__10))) !== 0)) {
+			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << ListaComandosParser.INSERIR_INICIO) | (1 << ListaComandosParser.INSERIR_FIM) | (1 << ListaComandosParser.INSERIR_APOS) | (1 << ListaComandosParser.REMOVER_INICIO) | (1 << ListaComandosParser.REMOVER_FIM) | (1 << ListaComandosParser.REMOVER_ELEMENTO) | (1 << ListaComandosParser.REMOVER_POSICAO))) !== 0)) {
 				{
 				{
 				this.state = 22;
@@ -144,49 +145,49 @@ export class ListaComandosParser extends Parser {
 			this.state = 37;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ListaComandosParser.T__0:
+			case ListaComandosParser.INSERIR_INICIO:
 				this.enterOuterAlt(_localctx, 1);
 				{
 				this.state = 30;
 				this.inserir_inicioCommand();
 				}
 				break;
-			case ListaComandosParser.T__4:
+			case ListaComandosParser.INSERIR_FIM:
 				this.enterOuterAlt(_localctx, 2);
 				{
 				this.state = 31;
 				this.inserir_fimCommand();
 				}
 				break;
-			case ListaComandosParser.T__5:
+			case ListaComandosParser.INSERIR_APOS:
 				this.enterOuterAlt(_localctx, 3);
 				{
 				this.state = 32;
 				this.inserir_aposCommand();
 				}
 				break;
-			case ListaComandosParser.T__7:
+			case ListaComandosParser.REMOVER_INICIO:
 				this.enterOuterAlt(_localctx, 4);
 				{
 				this.state = 33;
 				this.remover_inicioCommand();
 				}
 				break;
-			case ListaComandosParser.T__8:
+			case ListaComandosParser.REMOVER_FIM:
 				this.enterOuterAlt(_localctx, 5);
 				{
 				this.state = 34;
 				this.remover_fimCommand();
 				}
 				break;
-			case ListaComandosParser.T__9:
+			case ListaComandosParser.REMOVER_ELEMENTO:
 				this.enterOuterAlt(_localctx, 6);
 				{
 				this.state = 35;
 				this.remover_elementoCommand();
 				}
 				break;
-			case ListaComandosParser.T__10:
+			case ListaComandosParser.REMOVER_POSICAO:
 				this.enterOuterAlt(_localctx, 7);
 				{
 				this.state = 36;
@@ -219,15 +220,15 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 39;
-			this.match(ListaComandosParser.T__0);
+			this.match(ListaComandosParser.INSERIR_INICIO);
 			this.state = 40;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 41;
 			this.valor();
 			this.state = 42;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 43;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -252,15 +253,15 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 45;
-			this.match(ListaComandosParser.T__4);
+			this.match(ListaComandosParser.INSERIR_FIM);
 			this.state = 46;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 47;
 			this.valor();
 			this.state = 48;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 49;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -285,19 +286,19 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 51;
-			this.match(ListaComandosParser.T__5);
+			this.match(ListaComandosParser.INSERIR_APOS);
 			this.state = 52;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 53;
 			this.valor();
 			this.state = 54;
-			this.match(ListaComandosParser.T__6);
+			this.match(ListaComandosParser.COMMA);
 			this.state = 55;
 			this.valor();
 			this.state = 56;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 57;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -322,13 +323,13 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 59;
-			this.match(ListaComandosParser.T__7);
+			this.match(ListaComandosParser.REMOVER_INICIO);
 			this.state = 60;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 61;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 62;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -353,13 +354,13 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 64;
-			this.match(ListaComandosParser.T__8);
+			this.match(ListaComandosParser.REMOVER_FIM);
 			this.state = 65;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 66;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 67;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -384,15 +385,15 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 69;
-			this.match(ListaComandosParser.T__9);
+			this.match(ListaComandosParser.REMOVER_ELEMENTO);
 			this.state = 70;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 71;
 			this.valor();
 			this.state = 72;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 73;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -417,15 +418,15 @@ export class ListaComandosParser extends Parser {
 			this.enterOuterAlt(_localctx, 1);
 			{
 			this.state = 75;
-			this.match(ListaComandosParser.T__10);
+			this.match(ListaComandosParser.REMOVER_POSICAO);
 			this.state = 76;
-			this.match(ListaComandosParser.T__1);
+			this.match(ListaComandosParser.LPAREN);
 			this.state = 77;
 			this.posicao();
 			this.state = 78;
-			this.match(ListaComandosParser.T__2);
+			this.match(ListaComandosParser.RPAREN);
 			this.state = 79;
-			this.match(ListaComandosParser.T__3);
+			this.match(ListaComandosParser.SEMICOLON);
 			}
 		}
 		catch (re) {
@@ -526,19 +527,18 @@ export class ListaComandosParser extends Parser {
 		"\n\x06\x02#(\x05\f\x07\x02$(\x05\x0E\b\x02%(\x05\x10\t\x02&(\x05\x12\n" +
 		"\x02\' \x03\x02\x02\x02\'!\x03\x02\x02\x02\'\"\x03\x02\x02\x02\'#\x03" +
 		"\x02\x02\x02\'$\x03\x02\x02\x02\'%\x03\x02\x02\x02\'&\x03\x02\x02\x02" +
-		"(\x05\x03\x02\x02\x02)*\x07\x03\x02\x02*+\x07\x04\x02\x02+,\x05\x14\v" +
-		"\x02,-\x07\x05\x02\x02-.\x07\x06\x02\x02.\x07\x03\x02\x02\x02/0\x07\x07" +
-		"\x02\x0201\x07\x04\x02\x0212\x05\x14\v\x0223\x07\x05\x02\x0234\x07\x06" +
-		"\x02\x024\t\x03\x02\x02\x0256\x07\b\x02\x0267\x07\x04\x02\x0278\x05\x14" +
-		"\v\x0289\x07\t\x02\x029:\x05\x14\v\x02:;\x07\x05\x02\x02;<\x07\x06\x02" +
-		"\x02<\v\x03\x02\x02\x02=>\x07\n\x02\x02>?\x07\x04\x02\x02?@\x07\x05\x02" +
-		"\x02@A\x07\x06\x02\x02A\r\x03\x02\x02\x02BC\x07\v\x02\x02CD\x07\x04\x02" +
-		"\x02DE\x07\x05\x02\x02EF\x07\x06\x02\x02F\x0F\x03\x02\x02\x02GH\x07\f" +
-		"\x02\x02HI\x07\x04\x02\x02IJ\x05\x14\v\x02JK\x07\x05\x02\x02KL\x07\x06" +
-		"\x02\x02L\x11\x03\x02\x02\x02MN\x07\r\x02\x02NO\x07\x04\x02\x02OP\x05" +
-		"\x16\f\x02PQ\x07\x05\x02\x02QR\x07\x06\x02\x02R\x13\x03\x02\x02\x02ST" +
-		"\t\x02\x02\x02T\x15\x03\x02\x02\x02UV\x07\x0F\x02\x02V\x17\x03\x02\x02" +
-		"\x02\x04\x1B\'";
+		"(\x05\x03\x02\x02\x02)*\x07\x03\x02\x02*+\x07\n\x02\x02+,\x05\x14\v\x02" +
+		",-\x07\v\x02\x02-.\x07\r\x02\x02.\x07\x03\x02\x02\x02/0\x07\x04\x02\x02" +
+		"01\x07\n\x02\x0212\x05\x14\v\x0223\x07\v\x02\x0234\x07\r\x02\x024\t\x03" +
+		"\x02\x02\x0256\x07\x05\x02\x0267\x07\n\x02\x0278\x05\x14\v\x0289\x07\f" +
+		"\x02\x029:\x05\x14\v\x02:;\x07\v\x02\x02;<\x07\r\x02\x02<\v\x03\x02\x02" +
+		"\x02=>\x07\x06\x02\x02>?\x07\n\x02\x02?@\x07\v\x02\x02@A\x07\r\x02\x02" +
+		"A\r\x03\x02\x02\x02BC\x07\x07\x02\x02CD\x07\n\x02\x02DE\x07\v\x02\x02" +
+		"EF\x07\r\x02\x02F\x0F\x03\x02\x02\x02GH\x07\b\x02\x02HI\x07\n\x02\x02" +
+		"IJ\x05\x14\v\x02JK\x07\v\x02\x02KL\x07\r\x02\x02L\x11\x03\x02\x02\x02" +
+		"MN\x07\t\x02\x02NO\x07\n\x02\x02OP\x05\x16\f\x02PQ\x07\v\x02\x02QR\x07" +
+		"\r\x02\x02R\x13\x03\x02\x02\x02ST\t\x02\x02\x02T\x15\x03\x02\x02\x02U" +
+		"V\x07\x0F\x02\x02V\x17\x03\x02\x02\x02\x04\x1B\'";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {
 		if (!ListaComandosParser.__ATN) {
@@ -640,9 +640,13 @@ export class CommandContext extends ParserRuleContext {
 
 
 export class Inserir_inicioCommandContext extends ParserRuleContext {
+	public INSERIR_INICIO(): TerminalNode { return this.getToken(ListaComandosParser.INSERIR_INICIO, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
 	public valor(): ValorContext {
 		return this.getRuleContext(0, ValorContext);
 	}
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
@@ -672,9 +676,13 @@ export class Inserir_inicioCommandContext extends ParserRuleContext {
 
 
 export class Inserir_fimCommandContext extends ParserRuleContext {
+	public INSERIR_FIM(): TerminalNode { return this.getToken(ListaComandosParser.INSERIR_FIM, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
 	public valor(): ValorContext {
 		return this.getRuleContext(0, ValorContext);
 	}
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
@@ -704,6 +712,8 @@ export class Inserir_fimCommandContext extends ParserRuleContext {
 
 
 export class Inserir_aposCommandContext extends ParserRuleContext {
+	public INSERIR_APOS(): TerminalNode { return this.getToken(ListaComandosParser.INSERIR_APOS, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
 	public valor(): ValorContext[];
 	public valor(i: number): ValorContext;
 	public valor(i?: number): ValorContext | ValorContext[] {
@@ -713,6 +723,9 @@ export class Inserir_aposCommandContext extends ParserRuleContext {
 			return this.getRuleContext(i, ValorContext);
 		}
 	}
+	public COMMA(): TerminalNode { return this.getToken(ListaComandosParser.COMMA, 0); }
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
@@ -742,6 +755,10 @@ export class Inserir_aposCommandContext extends ParserRuleContext {
 
 
 export class Remover_inicioCommandContext extends ParserRuleContext {
+	public REMOVER_INICIO(): TerminalNode { return this.getToken(ListaComandosParser.REMOVER_INICIO, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
@@ -771,6 +788,10 @@ export class Remover_inicioCommandContext extends ParserRuleContext {
 
 
 export class Remover_fimCommandContext extends ParserRuleContext {
+	public REMOVER_FIM(): TerminalNode { return this.getToken(ListaComandosParser.REMOVER_FIM, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
@@ -800,9 +821,13 @@ export class Remover_fimCommandContext extends ParserRuleContext {
 
 
 export class Remover_elementoCommandContext extends ParserRuleContext {
+	public REMOVER_ELEMENTO(): TerminalNode { return this.getToken(ListaComandosParser.REMOVER_ELEMENTO, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
 	public valor(): ValorContext {
 		return this.getRuleContext(0, ValorContext);
 	}
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
@@ -832,9 +857,13 @@ export class Remover_elementoCommandContext extends ParserRuleContext {
 
 
 export class Remover_posicaoCommandContext extends ParserRuleContext {
+	public REMOVER_POSICAO(): TerminalNode { return this.getToken(ListaComandosParser.REMOVER_POSICAO, 0); }
+	public LPAREN(): TerminalNode { return this.getToken(ListaComandosParser.LPAREN, 0); }
 	public posicao(): PosicaoContext {
 		return this.getRuleContext(0, PosicaoContext);
 	}
+	public RPAREN(): TerminalNode { return this.getToken(ListaComandosParser.RPAREN, 0); }
+	public SEMICOLON(): TerminalNode { return this.getToken(ListaComandosParser.SEMICOLON, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
