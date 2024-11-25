@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@svgdotjs/svg.js": "^3.2.4",
     "antlr4": "^4.13.2",
     "flowbite": "^2.5.2",
