@@ -66,18 +66,36 @@ const SvgRenderer = {
      * @param {number} id - ID único do nó a ser removido.
      */
     removerNo(id) {
-        //oi migo, aqui ele não tá removendo da lista, só mudei de cor, e acho (quase certeza) que é esse o b.o.
-        // na hora de inserir fica tudo cagado
-        // testa removendo todos os nós e depois inserindo tanto no inicio quanto no fim
         console.log(`Removendo nó com id=${id}`);
         const node = this.getNodeById(id);
+    
         if (node) {
+            // Alterar cor do nó para indicar remoção
             node.rect.fill('#AAA'); // Cor apagada
             node.text.fill('#FFF'); // Texto apagado
+    
+            // Remover todas as setas que apontam para o nó
+            this.arrows = this.arrows.filter((arrowObj) => {
+                if (arrowObj.toNode && arrowObj.toNode.id === id) {
+                    arrowObj.arrow.remove(); // Remove a linha
+                    arrowObj.arrowHead.remove(); // Remove a cabeça da seta
+                    return false; // Remove da lista de setas
+                }
+                return true; // Mantém as setas restantes
+            });
+    
+            // Atualizar a seta do nó anterior (se existir)
+            const fromNodeIndex = this.nodes.findIndex((n) => n.id === id) - 1;
+            const toNodeIndex = this.nodes.findIndex((n) => n.id === id) + 1;
+    
+            if (fromNodeIndex >= 0 && toNodeIndex < this.nodes.length) {
+                this._createArrow(this.nodes[fromNodeIndex], this.nodes[toNodeIndex]);
+            }
         } else {
             console.warn(`Nó com id=${id} não encontrado.`);
         }
-    },
+    },    
+    
 
     getNodeById(id) {
         // Lógica para buscar o nó pela ID no seu gráfico, provavelmente em um array ou mapa
@@ -106,16 +124,16 @@ const SvgRenderer = {
         const fromY = fromNode.y + 25;
         const toX = toNode.x;
         const toY = toNode.y + 25;
-
-        // Alterando a cor da seta para branco
-        const arrow = this.container.line(fromX, fromY, toX, toY).stroke({ width: 2, color: '#FFF' }); // cor alterada aqui
+    
+        // Criar linha e cabeça da seta
+        const arrow = this.container.line(fromX, fromY, toX, toY).stroke({ width: 2, color: '#FFF' });
         const arrowHead = this.container
             .polygon(`${toX - 5},${toY - 5} ${toX},${toY} ${toX - 5},${toY + 5}`)
-            .fill('#FFF');  // Cor da cabeça da seta também alterada para branco
-
-        this.arrows.push({ arrow, arrowHead });
-        toNode.arrow = { arrow, arrowHead };
+            .fill('#FFF');
+    
+        this.arrows.push({ fromNode, toNode, arrow, arrowHead });
     },
+    
 
 
     /**
@@ -133,16 +151,14 @@ const SvgRenderer = {
         });
         this.arrows = [];
     
-        // Obtém nós ativos (ignorando nós "apagados")
+        // Obtém nós ativos (ignorando nós apagados)
         const activeNodes = this.nodes.filter(node => node.rect.fill() !== "#AAA");
     
         // Recria as setas entre os nós ativos
         for (let i = 0; i < activeNodes.length - 1; i++) {
             this._createArrow(activeNodes[i], activeNodes[i + 1]);
         }
-    }
-    
-    ,    
+    },
 
     /**
      * Atualiza as posições dos nós no SVG com base na lista atual.
