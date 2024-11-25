@@ -1,10 +1,14 @@
-"use client";
-
 import { useState } from "react";
 import { Modal } from "flowbite-react";
+import { Poppins} from "next/font/google";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
+const poppins = Poppins({
+  weight: ["400", "600", "700"],
+  subsets: ["latin"],
+});
 export default function TutorialModal() {
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState(true); // Estado que controla a visibilidade
     const [step, setStep] = useState(1);
 
     const stepsContent = [
@@ -77,31 +81,50 @@ export default function TutorialModal() {
     ];
 
     return (
-        <Modal show={show} onClose={() => setShow(false)}>
-            <Modal.Header className="bg-gray-900 text-gray-200">Tutorial Inicial</Modal.Header>
-            <Modal.Body className="bg-gray-900 text-gray-200">{stepsContent[step - 1].message}</Modal.Body>
-            <Modal.Footer className="bg-gray-900 flex justify-between">
+        <div>
+            <Modal
+                show={show}
+                onClose={() => setShow(false)}
+                className={`${poppins.className}`}
+            >
+                <Modal.Header className={`${poppins.className} bg-gray-900 text-gray-200`}>
+                    Tutorial Inicial
+                </Modal.Header>
+                <Modal.Body className="bg-gray-900 text-gray-200">{stepsContent[step - 1].message}</Modal.Body>
+                <Modal.Footer className="bg-gray-900 flex justify-between">
+                    <button
+                        className={`px-3 py-1 rounded-lg ${
+                            step === 1 ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-300 text-gray-800"
+                        }`}
+                        disabled={step === 1}
+                        onClick={() => setStep(step - 1)}
+                    >
+                        Voltar
+                    </button>
+                    <button
+                        className={`px-3 py-1 rounded-lg ${
+                            step === stepsContent.length
+                                ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                : "bg-blue-500 text-white hover:bg-blue-600"
+                        }`}
+                        disabled={step === stepsContent.length}
+                        onClick={() => setStep(step + 1)}
+                    >
+                        Avançar
+                    </button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Botão para reabrir o tutorial */}
+            {!show && (
                 <button
-                    className={`px-3 py-1 rounded-lg ${
-                        step === 1 ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-300 text-gray-800"
-                    }`}
-                    disabled={step === 1}
-                    onClick={() => setStep(step - 1)}
-                >
-                    Voltar
-                </button>
-                <button
-                    className={`px-3 py-1 rounded-lg ${
-                        step === stepsContent.length
-                            ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                            : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
-                    disabled={step === stepsContent.length}
-                    onClick={() => setStep(step + 1)}
-                >
-                    Avançar
-                </button>
-            </Modal.Footer>
-        </Modal>
+                className="mt-4 bg-transparent text-azul-logo px-4 py-2 rounded-lg hover:bg-white fixed bottom-10 right-10 z-10"
+                onClick={() => setShow(true)}
+            >
+                <QuestionMarkCircleIcon className="w-8 h-8" />
+            </button>
+            
+            )}
+        </div>
     );
 }

@@ -1,5 +1,3 @@
-// src/app/page.tsx
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -8,8 +6,8 @@ import { ListaComandosLexer } from "../parser/ListaComandosLexer";
 import { ListaComandosParser } from "../parser/ListaComandosParser";
 import MyErrorListener from "../libs/ErrorListener";
 import TutorialModal from "../components/Tutorial";
-import Ldse from "../libs/Ldse.js"; // Importação com extensão .js
-import SvgRenderer from "../libs/SvgRenderer.js"; // Importação com extensão .js
+import Ldse from "../libs/Ldse.js";
+import SvgRenderer from "../libs/SvgRenderer.js";
 import ListaVisitor from "../libs/ListaVisitor";
 import { Poppins, Ubuntu_Mono } from "next/font/google";
 
@@ -21,17 +19,19 @@ const courier = Ubuntu_Mono({
   weight: ["400", "700"],
   subsets: ["latin"],
 });
+
 const Page: React.FC = () => {
   const [input, setInput] = useState<string>("");
-  const [valores, setValores] = useState<any[]>([]); // Estado da lista
-  const [mensagem, setMensagem] = useState<string>(""); // Estado para mensagens de feedback
+  const [valores, setValores] = useState<any[]>([]);
+  const [mensagem, setMensagem] = useState<string>("");
+
   const svgContainerRef = useRef<HTMLDivElement>(null);
-  const svgRendererRef = useRef<typeof SvgRenderer | null>(null); // Uso de typeof SvgRenderer
+  const svgRendererRef = useRef<typeof SvgRenderer | null>(null);
   const listaRef = useRef<Ldse | null>(null);
 
   useEffect(() => {
     if (svgContainerRef.current && !svgRendererRef.current) {
-      SvgRenderer.init("svg-container"); // Inicializa o SvgRenderer com o ID do contêiner
+      SvgRenderer.init("svg-container");
       svgRendererRef.current = SvgRenderer;
       listaRef.current = new Ldse(svgRendererRef.current);
       console.log(
@@ -55,34 +55,16 @@ const Page: React.FC = () => {
     const tokens = new CommonTokenStream(lexer);
     tokens.fill();
 
-    // Primeira execução
     const parser = new ListaComandosParser(tokens);
     parser.buildParseTree = true;
-
-    // Remove listeners de erro padrão e adiciona o listener personalizado
     parser.removeErrorListeners();
     parser.addErrorListener(new MyErrorListener());
 
-    // Log dos tokens para depuração
-    tokens.getTokens().forEach((token) => {
-      console.log(
-        `Token: ${lexer.vocabulary.getSymbolicName(token.type)}, Texto: '${token.text
-        }'`
-      );
-    });
-
-    // Cria uma instância do listener personalizado
-
-    console.log("Iniciando o parsing");
-
     try {
       const tree = parser.commands();
-      console.log("Iniciando parsing com Visitor");
       const visitor = new ListaVisitor(listaRef.current!);
-      visitor.visit(tree); // Passa a árvore raiz gerada pelo parser para o Visitor
-      console.log("Parsing concluído com Visitor");
+      visitor.visit(tree);
 
-      // Atualiza os valores
       setValores(listaRef.current!.getValores());
       setMensagem("Comandos executados com sucesso!");
     } catch (e) {
@@ -93,24 +75,26 @@ const Page: React.FC = () => {
 
   return (
     <div className={poppins.className}>
-      <TutorialModal />
-      <div className={`bg-white text-gray-200 p-6`}>
-        <div className="flex items-center gap-4 mb-2">
-          {/* Logo */}
-          <img src="/icon.png" alt="Logo" className="w-12 h-12" />
 
-          {/* Título */}
-          <h1 className="text-2xl font-bold text-azul-logo">GraphList</h1>
+      <TutorialModal />
+
+
+      <div className="bg-white text-gray-200 p-6 relative">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-4">
+            <img src="/icon.png" alt="Logo" className="w-12 h-12" />
+            <h1 className="text-2xl font-bold text-azul-logo">GraphList</h1>
+          </div>
+         
         </div>
-        {/* Subtítulo */}
         <p className="text-gray-800 text-lg">
           Sua ferramenta para manipulação de listas encadeadas com visualização
           dinâmica
         </p>
       </div>
+
       <div className="flex flex-col gap-6 p-6 bg-white">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Digitar Comandos */}
           <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
               <h5 className="text-lg font-bold mb-3 text-white">
@@ -119,8 +103,8 @@ const Page: React.FC = () => {
               <textarea
                 value={input}
                 rows={4}
-
-                className={`${courier.className} w-full bg-gray-800 text-gray-300 p-3 rounded-lg focus:outline-none focus:ring focus:ring-blue-500`} placeholder="Digite seus comandos aqui..."
+                className={`${courier.className} w-full bg-gray-800 text-gray-300 p-3 rounded-lg focus:outline-none focus:ring focus:ring-blue-500`}
+                placeholder="Digite seus comandos aqui..."
                 onChange={(e) => setInput(e.target.value)}
               />
               <button
@@ -132,7 +116,6 @@ const Page: React.FC = () => {
             </div>
           </div>
 
-          {/* Situação da Lista */}
           <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
               <h5 className="text-lg font-bold mb-3 text-white">
@@ -155,7 +138,6 @@ const Page: React.FC = () => {
           </div>
         </div>
 
-        {/* SVG Container */}
         <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
           <h5 className="text-lg font-bold mb-3 text-white">
             Visualização da Lista
