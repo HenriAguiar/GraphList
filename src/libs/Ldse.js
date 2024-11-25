@@ -57,62 +57,85 @@ class Ldse {
 
     remover_inicio() {
         console.log(`Método remover_inicio chamado`);
+    
         if (this.quant === 1) {
-            this.svgRenderer.removerNo(this.prim.id);
-            this.prim = this.ult = null;
+            // Caso de apenas um nó na lista
+            this.svgRenderer.mudarCorNo(this.prim.id); // Muda apenas a cor do nó inicial
+            // Não redefinimos `this.prim` ou `this.ult` para manter a referência lógica
         } else {
-            this.svgRenderer.removerNo(this.prim.id);
+            // Caso com mais de um nó
+            this.svgRenderer.mudarCorNo(this.prim.id); // Muda a cor do nó inicial
+            
+            // Atualiza a referência lógica para o próximo nó
             this.prim = this.prim.prox;
+    
+            // Recalcula as setas e as posições
             this.svgRenderer.atualizarPosicoes(this.getListaComIds());
         }
+    
+        // Atualiza a quantidade de nós
         this.quant -= 1;
-        console.log(`Quantidade após remover_inicio: ${this.quant}`);
+        console.log("Quantidade após remover_inicio:", this.quant);
+    
+        // Atualiza visualmente após remoção
+        this.svgRenderer.atualizarPosicoes(this.getListaComIds());
     }
+    
+    
+
+
 
     remover_fim() {
-        console.log(`Método remover_fim chamado`);
+        console.log("Método remover_fim chamado");
+
         if (this.quant === 1) {
-            this.svgRenderer.removerNo(this.ult.id);
-            this.prim = this.ult = null;
+            // Apenas um nó, muda sua cor e não remove.
+            this.svgRenderer.mudarCorNo(this.prim.id);
         } else {
             let aux = this.prim;
             while (aux.prox !== this.ult) {
-                aux = aux.prox;
+                aux = aux.prox; // Penúltimo nó
             }
-            this.svgRenderer.removerNo(this.ult.id);
-            aux.prox = null;
+
+            // Mude a cor do último nó
+            this.svgRenderer.mudarCorNo(this.ult.id);
+
+            // Atualize o último nó na lista
             this.ult = aux;
-            this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+            this.ult.prox = null; // Remove a referência ao nó "removido" para parar as setas
         }
-        this.quant -= 1;
-        console.log(`Quantidade após remover_fim: ${this.quant}`);
+
+        this.quant -= 1; // Atualiza a quantidade, mas o nó permanece na lista.
+        console.log("Quantidade após remover_fim:", this.quant);
+        this.svgRenderer.atualizarPosicoes(this.getListaComIds());
     }
+
 
     remover_elemento(valor) {
         console.log(`Método remover_elemento chamado com valor: ${valor}`);
         if (!this.prim) return;
-        if (this.prim.info === valor) {
-            this.remover_inicio();
-            return;
-        }
+
         let no_primeiro = this.prim;
-        let no_segundo = no_primeiro.prox;
-        while (no_segundo !== null) {
-            if (no_segundo.info === valor) {
-                this.svgRenderer.removerNo(no_segundo.id);
-                no_primeiro.prox = no_segundo.prox;
-                if (no_segundo === this.ult) {
-                    this.ult = no_primeiro;
-                }
-                this.quant -= 1;
-                this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-                console.log(`Quantidade após remover_elemento: ${this.quant}`);
+
+        // Percorre a lista para encontrar o nó com o valor desejado
+        while (no_primeiro !== null) {
+            if (no_primeiro.info === valor) {
+                // Marca o nó como removido visualmente (mudando a cor)
+                this.svgRenderer.mudarCorNo(no_primeiro.id);
+
+                // Recalcula as setas, considerando os nós visíveis
+                this.svgRenderer._rebuildArrows();
+                console.log(`Nó com valor=${valor} marcado como removido visualmente.`);
                 return;
             }
-            no_primeiro = no_segundo;
-            no_segundo = no_segundo.prox;
+            no_primeiro = no_primeiro.prox;
         }
+
+        console.warn(`Nó com valor=${valor} não encontrado.`);
     }
+
+
+
 
     inserir_apos(valorPivo, valor) {
         console.log(`Método inserir_apos chamado com valorPivo: ${valorPivo}, valorNovo: ${valor}`);
@@ -136,31 +159,49 @@ class Ldse {
 
     remover_posicao(posicao) {
         console.log(`Método remover_posicao chamado com posicao: ${posicao}`);
+
         if (posicao > this.quant - 1 || posicao < 0 || this.quant === 0) {
             console.warn(`Posição inválida: ${posicao}`);
             return;
-        } else if (posicao === 0) {
-            this.remover_inicio();
-            return;
-        } else if (posicao === this.quant - 1) {
-            this.remover_fim();
-            return;
-        } else {
-            let ant = null;
-            let aux = this.prim;
-            let i = 0;
-            while (i !== posicao) {
-                ant = aux;
-                aux = aux.prox;
-                i += 1;
-            }
-            this.svgRenderer.removerNo(aux.id);
-            ant.prox = aux.prox;
-            this.quant -= 1;
-            this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-            console.log(`Quantidade após remover_posicao: ${this.quant}`);
         }
+
+        let ant = null;
+        let aux = this.prim;
+        let i = 0;
+
+        // Localiza o nó na posição desejada
+        while (i !== posicao) {
+            ant = aux;
+            aux = aux.prox;
+            i++;
+        }
+
+        // Marca o nó como "removido" (muda a cor)
+        this.svgRenderer.mudarCorNo(aux.id);
+
+        // Atualiza as referências para ignorar o nó removido
+        if (ant === null) {
+            // Caso especial: removendo o primeiro nó
+            this.prim = aux.prox;
+        } else {
+            ant.prox = aux.prox;
+        }
+
+        if (aux === this.ult) {
+            // Caso especial: removendo o último nó
+            this.ult = ant;
+        }
+
+        this.quant -= 1;
+
+        // Atualiza visualmente as posições e setas
+        this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+        console.log(`Quantidade após remover_posicao: ${this.quant}`);
     }
+
+
+
+
 
     toArray() {
         const resultado = [];

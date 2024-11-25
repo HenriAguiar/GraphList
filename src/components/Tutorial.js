@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Modal } from "flowbite-react";
 
 export default function TutorialModal() {
-    const [show, setShow] = useState(true);
+    const [show, setShow] = useState(false);
     const [step, setStep] = useState(1);
 
     const stepsContent = [

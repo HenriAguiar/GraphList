@@ -11,6 +11,16 @@ import TutorialModal from "../components/Tutorial";
 import Ldse from "../libs/Ldse.js"; // Importação com extensão .js
 import SvgRenderer from "../libs/SvgRenderer.js"; // Importação com extensão .js
 import ListaVisitor from "../libs/ListaVisitor";
+import { Poppins, Ubuntu_Mono } from "next/font/google";
+
+const poppins = Poppins({
+  weight: ["400", "600", "700"],
+  subsets: ["latin"],
+});
+const courier = Ubuntu_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+});
 const Page: React.FC = () => {
   const [input, setInput] = useState<string>("");
   const [valores, setValores] = useState<any[]>([]); // Estado da lista
@@ -56,8 +66,7 @@ const Page: React.FC = () => {
     // Log dos tokens para depuração
     tokens.getTokens().forEach((token) => {
       console.log(
-        `Token: ${lexer.vocabulary.getSymbolicName(token.type)}, Texto: '${
-          token.text
+        `Token: ${lexer.vocabulary.getSymbolicName(token.type)}, Texto: '${token.text
         }'`
       );
     });
@@ -83,35 +92,35 @@ const Page: React.FC = () => {
   };
 
   return (
-    <>
-    <TutorialModal/>
-      <div className="bg-gray-900 text-gray-200 p-6 rounded-lg shadow-lg">
+    <div className={poppins.className}>
+      <TutorialModal />
+      <div className={`bg-white text-gray-200 p-6`}>
         <div className="flex items-center gap-4 mb-2">
           {/* Logo */}
-          <img src="/icon.png" alt="Logo" className="w-12 h-12 rounded-full" />
+          <img src="/icon.png" alt="Logo" className="w-12 h-12" />
 
           {/* Título */}
-          <h1 className="text-2xl font-bold text-blue-500">GraphList</h1>
+          <h1 className="text-2xl font-bold text-azul-logo">GraphList</h1>
         </div>
         {/* Subtítulo */}
-        <p className="text-gray-400 text-lg">
+        <p className="text-gray-800 text-lg">
           Sua ferramenta para manipulação de listas encadeadas com visualização
           dinâmica
         </p>
       </div>
-      <div className="flex flex-col gap-6 p-6 bg-gray-800 rounded-lg shadow-lg">
+      <div className="flex flex-col gap-6 p-6 bg-white">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Digitar Comandos */}
           <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
-              <h5 className="text-lg font-bold mb-3 text-blue-500">
+              <h5 className="text-lg font-bold mb-3 text-white">
                 Digitar Comandos
               </h5>
               <textarea
                 value={input}
                 rows={4}
-                className="w-full bg-gray-800 text-gray-300 p-3 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
-                placeholder="Digite seus comandos aqui..."
+
+                className={`${courier.className} w-full bg-gray-800 text-gray-300 p-3 rounded-lg focus:outline-none focus:ring focus:ring-blue-500`} placeholder="Digite seus comandos aqui..."
                 onChange={(e) => setInput(e.target.value)}
               />
               <button
@@ -126,7 +135,7 @@ const Page: React.FC = () => {
           {/* Situação da Lista */}
           <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
-              <h5 className="text-lg font-bold mb-3 text-blue-500">
+              <h5 className="text-lg font-bold mb-3 text-white">
                 Situação da Lista
               </h5>
               <ul className="flex gap-2">
@@ -135,7 +144,7 @@ const Page: React.FC = () => {
                     key={index}
                     className="bg-gray-800 text-gray-300 py-2 px-4 rounded-lg shadow-md relative"
                   >
-                    <span className="absolute top-1 left-1 text-xs text-blue-400">
+                    <span className="absolute top-1 left-1 text-xs text-azul-logo">
                       {index}
                     </span>
                     <span className="text-lg">{item}</span>
@@ -148,7 +157,7 @@ const Page: React.FC = () => {
 
         {/* SVG Container */}
         <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
-          <h5 className="text-lg font-bold mb-3 text-blue-500">
+          <h5 className="text-lg font-bold mb-3 text-white">
             Visualização da Lista
           </h5>
           <div
@@ -158,7 +167,7 @@ const Page: React.FC = () => {
           ></div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
