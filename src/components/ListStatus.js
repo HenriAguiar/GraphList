@@ -2,7 +2,7 @@
 import React from 'react';
 
 const ListStatus = ({ valores }) => (
-  <div className="bg-gray-900 text-gray-200 p-4 rounded-lg h-[316px]">
+  <div className="bg-gray-900 text-gray-200 p-4 rounded-lg h-[116px] mb-2">
     <h5 className="text-lg font-bold mb-3 text-white">
       Situação da Lista
     </h5>

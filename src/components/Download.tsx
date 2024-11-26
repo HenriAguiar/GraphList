@@ -59,11 +59,11 @@ const Download: React.FC<DownloadProps> = ({ comandos, valores, svgContainerRef,
   return (
     <div
       onClick={handleExport}
-      className="cursor-pointer text-blue-500 hover:text-blue-600 transition-colors transform hover:scale-110 flex items-center justify-center"
+      className="cursor-pointer text-azul-logo hover:text-blue-600 transition-colors transform hover:scale-110 flex items-center justify-center"
       title={type === "comandos" ? "Baixar Comandos como TXT" : "Baixar Estrutura como SVG"}
       aria-label={type === "comandos" ? "Baixar Comandos" : "Baixar SVG"}
     >
-      <FiDownload size={28} className="hover:shadow-lg" />
+      <FiDownload size={24} className="hover:shadow-lg" />
     </div>
   );
 };

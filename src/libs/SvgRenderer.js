@@ -16,33 +16,32 @@ const SvgRenderer = {
   criarNo({ id, valor, x, y }) {
     const radius = 25;
     const startX = x - 100;
-
+  
     const rect = this.container.rect(2 * radius, radius * 2)
       .attr({ x: startX, y, rx: radius, ry: radius, fill: '#07c6ff' });
-
+  
     const text = this.container.text(valor.toString())
-      .attr({
-        x: startX + radius,
-        y: y + radius,
-        fontSize: 14,
-        fontFamily: 'Arial',
-        fill: 'white',
-        textAnchor: 'middle',
-        alignmentBaseline: 'middle'
-      });
-
+      .font({
+        size: 14,
+        family: 'Arial',
+        anchor: 'middle',
+      })
+      .fill('white')
+      .center(startX + radius, y + radius); // Centraliza o texto no retângulo
+  
     const rectAnim = rect.animate(500).move(x, y);
-    text.animate(500).move(x + radius, y + radius);
-
+    const textAnim = text.animate(500).center(x + radius, y + radius); // Atualiza a posição do texto para manter centralização
+  
     const animationPromise = new Promise(resolve => {
       rectAnim.after(() => {
         resolve();
       });
     });
-
+  
     const node = { id, rect, text, x, y, animationPromise };
     return node;
-  },
+  }
+  ,
 
   atualizarPosicoes(listaComIds) {
     return new Promise(resolve => {
@@ -50,38 +49,42 @@ const SvgRenderer = {
       this.nodes.forEach(node => {
         existingNodesMap[node.id] = node;
       });
-
+  
       const updatedNodes = [];
       const animations = [];
-
+  
       listaComIds.forEach((item) => {
         let node = existingNodesMap[item.id];
-
+  
         if (!node) {
+          // Cria o nó se ele não existir
           node = this.criarNo(item);
           animations.push(node.animationPromise);
         } else {
+          // Atualiza a posição do nó existente
           const rectAnim = node.rect.animate(500).move(item.x, item.y);
-          const textAnim = node.text.animate(500).move(item.x + 25, item.y + 25);
-
+          const textAnim = node.text.animate(500).center(item.x + 25, item.y + 25);
+  
           animations.push(new Promise(res => rectAnim.after(res)));
           animations.push(new Promise(res => textAnim.after(res)));
-
+  
+          // Atualiza as coordenadas do nó
           node.x = item.x;
           node.y = item.y;
         }
-
+  
         updatedNodes.push(node);
       });
-
+  
       this.nodes = updatedNodes;
-
+  
       Promise.all(animations).then(() => {
         this._rebuildArrows();
         resolve();
       });
     });
-  },
+  }
+  ,
 
   removerNo(id) {
     return new Promise(resolve => {
