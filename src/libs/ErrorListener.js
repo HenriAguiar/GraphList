@@ -1,13 +1,9 @@
-// src/libs/MyErrorListener.js
-
 import antlr4 from 'antlr4';
 
 class MyErrorListener extends antlr4.error.ErrorListener {
-  public hasError: boolean; // Declarar explicitamente a propriedade
-
   constructor() {
     super();
-    this.hasError = false; // Inicializar a propriedade
+    this.hasError = false; // Sinalizador para indicar se ocorreu um erro
   }
 
   syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
