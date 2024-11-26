@@ -123,12 +123,13 @@ export default function TutorialModal() {
 
       {/* Botão para reabrir o tutorial */}
       {!show && (
-        <button
-          className="mt-4 bg-transparent text-blue-500 px-4 py-2 rounded-lg hover:bg-gray-100 fixed bottom-10 right-10 z-10 transition duration-300"
-          onClick={() => setShow(true)}
-        >
-          <QuestionMarkCircleIcon className="w-8 h-8" />
-        </button>
+       <button
+className="absolute top-4 right-10 bg-transparent text-azul-logo px-4 py-2 rounded-full hover:text-gray-400 z-10 transition duration-300"
+       onClick={() => setShow(true)}
+     >
+       <QuestionMarkCircleIcon className="w-8 h-8" />
+     </button>
+     
       )}
     </div>
   );
