@@ -26,6 +26,7 @@ const Page = () => {
   const [input, setInput] = useState("");
   const [valores, setValores] = useState([]);
   const [mensagem, setMensagem] = useState("");
+  const [consoleMessages, setConsoleMessages] = useState([]);
 
   const svgContainerRef = useRef(null);
   const svgRendererRef = useRef(null);
@@ -42,6 +43,32 @@ const Page = () => {
         listaRef.current
       );
     }
+
+    // Substituir console.log e console.error
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
+
+    console.log = (...args) => {
+      setConsoleMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "log", message: args.join(" ") },
+      ]);
+      originalConsoleLog(...args);
+    };
+
+    console.error = (...args) => {
+      setConsoleMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "error", message: args.join(" ") },
+      ]);
+      originalConsoleError(...args);
+    };
+
+    // Limpeza na desmontagem do componente
+    return () => {
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+    };
   }, []);
 
   const handleExecute = async () => {
@@ -101,60 +128,78 @@ const Page = () => {
         </p>
       </div>
 
-      <div className="flex flex-col gap-6 p-6 bg-white">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
-              <h5 className="text-lg font-bold mb-3 text-white">
-                Digitar Comandos
-              </h5>
-              <textarea
-                value={input}
-                rows={4}
-                className={`${courier.className} w-full bg-gray-800 text-gray-300 p-3 rounded-lg focus:outline-none focus:ring focus:ring-blue-500`}
-                placeholder="Digite seus comandos aqui..."
-                onChange={(e) => setInput(e.target.value)}
-              />
-              <button
-                className="mt-3 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
-                onClick={handleExecute}
-              >
-                Confirmar
-              </button>
-            </div>
+      <div className="flex flex-row gap-6 p-6 bg-white">
+        {/* Coluna Esquerda */}
+        <div className="flex flex-col w-1/3 gap-6">
+          {/* Área de Texto para Comandos */}
+          <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
+            <h5 className="text-lg font-bold mb-3 text-white">
+              Digitar Comandos
+            </h5>
+            <textarea
+              value={input}
+              rows={4}
+              className={`${courier.className} w-full bg-gray-800 text-gray-300 p-3 rounded-lg focus:outline-none focus:ring focus:ring-blue-500`}
+              placeholder="Digite seus comandos aqui..."
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <button
+              className="mt-3 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+              onClick={handleExecute}
+            >
+              Confirmar
+            </button>
           </div>
-
-          <div className="flex-1">
-            <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
-              <h5 className="text-lg font-bold mb-3 text-white">
-                Situação da Lista
-              </h5>
-              <ul className="flex gap-2">
-                {valores.map((item, index) => (
-                  <li
-                    key={index}
-                    className="bg-gray-800 text-gray-300 py-2 px-4 rounded-lg shadow-md relative"
-                  >
-                    <span className="absolute top-1 left-1 text-xs text-azul-logo">
-                      {index}
-                    </span>
-                    <span className="text-lg">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Situação Atual da Lista */}
+          <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
+            <h5 className="text-lg font-bold mb-3 text-white">
+              Situação da Lista
+            </h5>
+            <ul className="flex gap-2">
+              {valores.map((item, index) => (
+                <li
+                  key={index}
+                  className="bg-gray-800 text-gray-300 py-2 px-4 rounded-lg shadow-md relative"
+                >
+                  <span className="absolute top-1 left-1 text-xs text-azul-logo">
+                    {index}
+                  </span>
+                  <span className="text-lg">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
-          <h5 className="text-lg font-bold mb-3 text-white">
-            Visualização da Lista
-          </h5>
-          <div
-            id="svg-container"
-            ref={svgContainerRef}
-            className="w-full h-64 bg-gray-800 border border-gray-600 rounded-lg"
-          ></div>
+        {/* Coluna Direita */}
+        <div className="flex flex-col w-2/3 gap-6">
+          {/* Visualização do SVG */}
+          <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
+            <h5 className="text-lg font-bold mb-3 text-white">
+              Visualização da Lista
+            </h5>
+            <div
+              id="svg-container"
+              ref={svgContainerRef}
+              className="w-full h-64 bg-gray-800 border border-gray-600 rounded-lg"
+            ></div>
+          </div>
+          {/* Console */}
+          <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
+            <h5 className="text-lg font-bold mb-3 text-white">Console</h5>
+            <div className="bg-black text-white p-2 rounded-lg h-64 overflow-y-scroll">
+              {consoleMessages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`${msg.type === "error" ? "text-red-500" : ""} ${
+                    courier.className
+                  }`}
+                >
+                  {msg.message}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
