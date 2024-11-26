@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Editor from "@monaco-editor/react";
 
 function CustomEditor({ value, onChange }) {
@@ -10,10 +10,10 @@ function CustomEditor({ value, onChange }) {
   return (
     <div
       style={{
-        overflow: "hidden",
+        overflow: "hidden", 
         borderRadius: "8px",
         height: "12rem",
-        backgroundColor: "#2d3748", // bg-gray-800 no código hexadecimal
+        backgroundColor: "#2d3748", 
       }}
     >
       <Editor
@@ -26,6 +26,10 @@ function CustomEditor({ value, onChange }) {
           quickSuggestions: false,
           wordBasedSuggestions: false,
           validate: false, 
+          scrollbar: {
+            horizontal: 'hidden', 
+            vertical: 'hidden'    
+          }
         }}
       />
     </div>
