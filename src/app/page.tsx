@@ -6,6 +6,7 @@ import { ListaComandosLexer } from "../parser/ListaComandosLexer";
 import { ListaComandosParser } from "../parser/ListaComandosParser";
 import MyErrorListener from "../libs/ErrorListener";
 import TutorialModal from "../components/Tutorial";
+import Download from "../components/Donwload";
 import Ldse from "../libs/Ldse.js";
 import SvgRenderer from "../libs/SvgRenderer.js";
 import ListaVisitor from "../libs/ListaVisitor";
@@ -23,6 +24,7 @@ const courier = Ubuntu_Mono({
 const Page: React.FC = () => {
   const [input, setInput] = useState<string>("");
   const [valores, setValores] = useState<any[]>([]);
+  const [comandos, setComandos] = useState<string[]>([]); // Array para armazenar comandos
   const [mensagem, setMensagem] = useState<string>("");
 
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +52,9 @@ const Page: React.FC = () => {
       return;
     }
 
+    // Adiciona o comando atual ao array
+    setComandos((prevComandos) => [...prevComandos, input]);
+
     const chars = new ANTLRInputStream(input);
     const lexer = new ListaComandosLexer(chars);
     const tokens = new CommonTokenStream(lexer);
@@ -75,9 +80,7 @@ const Page: React.FC = () => {
 
   return (
     <div className={poppins.className}>
-
       <TutorialModal />
-
 
       <div className="bg-white text-gray-200 p-6 relative">
         <div className="flex items-center justify-between mb-2">
@@ -85,7 +88,6 @@ const Page: React.FC = () => {
             <img src="/icon.png" alt="Logo" className="w-12 h-12" />
             <h1 className="text-2xl font-bold text-azul-logo">GraphList</h1>
           </div>
-         
         </div>
         <p className="text-gray-800 text-lg">
           Sua ferramenta para manipulação de listas encadeadas com visualização
@@ -97,9 +99,16 @@ const Page: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
-              <h5 className="text-lg font-bold mb-3 text-white">
-                Digitar Comandos
-              </h5>
+              <div className="flex items-center justify-between mb-3">
+                <h5 className="text-lg font-bold text-white">Digitar Comandos</h5>
+                {/* Ícone de Salvar Comandos */}
+                <Download
+                  comandos={comandos}
+                  valores={[]}
+                  svgContainerRef={null}
+                  type="comandos"
+                />
+              </div>
               <textarea
                 value={input}
                 rows={4}
@@ -118,18 +127,14 @@ const Page: React.FC = () => {
 
           <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg">
-              <h5 className="text-lg font-bold mb-3 text-white">
-                Situação da Lista
-              </h5>
+              <h5 className="text-lg font-bold mb-3 text-white">Situação da Lista</h5>
               <ul className="flex gap-2">
                 {valores.map((item, index) => (
                   <li
                     key={index}
                     className="bg-gray-800 text-gray-300 py-2 px-4 rounded-lg shadow-md relative"
                   >
-                    <span className="absolute top-1 left-1 text-xs text-azul-logo">
-                      {index}
-                    </span>
+                    <span className="absolute top-1 left-1 text-xs text-azul-logo">{index}</span>
                     <span className="text-lg">{item}</span>
                   </li>
                 ))}
@@ -139,9 +144,16 @@ const Page: React.FC = () => {
         </div>
 
         <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
-          <h5 className="text-lg font-bold mb-3 text-white">
-            Visualização da Lista
-          </h5>
+          <div className="flex items-center justify-between mb-3">
+            <h5 className="text-lg font-bold text-white">Visualização da Lista</h5>
+            {/* Ícone de Salvar SVG */}
+            <Download
+              comandos={[]}
+              valores={[]}
+              svgContainerRef={svgContainerRef}
+              type="svg"
+            />
+          </div>
           <div
             id="svg-container"
             ref={svgContainerRef}
