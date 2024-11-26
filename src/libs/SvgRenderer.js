@@ -5,12 +5,12 @@ import { SVG } from '@svgdotjs/svg.js';
 const SvgRenderer = {
   container: null,
   nodes: [],
-  arrows: [],
+  arrows: {},
 
   init(containerId) {
     this.container = SVG().addTo(`#${containerId}`).size('100%', '100%');
     this.nodes = [];
-    this.arrows = [];
+    this.arrows = {};
   },
 
   criarNo({ id, valor, x, y }) {
@@ -46,7 +46,6 @@ const SvgRenderer = {
 
   atualizarPosicoes(listaComIds) {
     return new Promise(resolve => {
-
       const existingNodesMap = {};
       this.nodes.forEach(node => {
         existingNodesMap[node.id] = node;
@@ -101,17 +100,16 @@ const SvgRenderer = {
 
         this.nodes.splice(nodeIndex, 1);
 
-        this.arrows = this.arrows.filter(arrowObj => {
+        // Remover setas associadas ao nó removido
+        const arrowKeysToRemove = [];
+        for (const key in this.arrows) {
+          const arrowObj = this.arrows[key];
           if (arrowObj.fromNode.id === id || arrowObj.toNode.id === id) {
-            const arrowAnim = arrowObj.arrow.animate(500).opacity(0).after(() => arrowObj.arrow.remove());
-            const arrowHeadAnim = arrowObj.arrowHead.animate(500).opacity(0).after(() => arrowObj.arrowHead.remove());
-
-            animations.push(new Promise(res => arrowAnim.after(res)));
-            animations.push(new Promise(res => arrowHeadAnim.after(res)));
-            return false;
+            this._removeArrow(arrowObj);
+            arrowKeysToRemove.push(key);
           }
-          return true;
-        });
+        }
+        arrowKeysToRemove.forEach(key => delete this.arrows[key]);
 
         Promise.all(animations).then(() => {
           this._rebuildArrows();
@@ -128,41 +126,67 @@ const SvgRenderer = {
   },
 
   _createArrow(fromNode, toNode) {
-
     const fromX = fromNode.x + 50;
     const fromY = fromNode.y + 25;
     const toX = toNode.x;
     const toY = toNode.y + 25;
 
-    const arrow = this.container.line(fromX, fromY, fromX, fromY)
+    const arrow = this.container.line(fromX, fromY, toX, toY)
       .stroke({ width: 2, color: '#FFF' });
 
-    arrow.animate(500).plot(fromX, fromY, toX, toY);
+    const arrowHead = this.container.polygon(`${toX - 5},${toY - 5} ${toX},${toY} ${toX - 5},${toY + 5}`).fill('#FFF');
 
-    const arrowHead = this.container.polygon('0,0 0,0 0,0').fill('#FFF');
+    return { fromNode, toNode, arrow, arrowHead };
+  },
+
+  _updateArrow(arrowObj, fromNode, toNode) {
+    const fromX = fromNode.x + 50;
+    const fromY = fromNode.y + 25;
+    const toX = toNode.x;
+    const toY = toNode.y + 25;
+
+    arrowObj.arrow.animate(500).plot(fromX, fromY, toX, toY);
     const headPoints = `${toX - 5},${toY - 5} ${toX},${toY} ${toX - 5},${toY + 5}`;
-    arrowHead.animate(500).plot(headPoints);
+    arrowObj.arrowHead.animate(500).plot(headPoints);
+  },
 
-    this.arrows.push({ fromNode, toNode, arrow, arrowHead });
+  _removeArrow(arrowObj) {
+    arrowObj.arrow.remove();
+    arrowObj.arrowHead.remove();
   },
 
   _rebuildArrows() {
+    const newArrowKeys = {};
 
-    this.arrows.forEach((arrowObj) => {
-      arrowObj.arrow.remove();
-      arrowObj.arrowHead.remove();
-    });
-    this.arrows = [];
-
+    // Criar ou atualizar setas
     for (let i = 0; i < this.nodes.length - 1; i++) {
-      this._createArrow(this.nodes[i], this.nodes[i + 1]);
+      const fromNode = this.nodes[i];
+      const toNode = this.nodes[i + 1];
+      const key = `${fromNode.id}-${toNode.id}`;
+      newArrowKeys[key] = true;
+
+      if (this.arrows[key]) {
+        // Atualizar posição da seta existente
+        this._updateArrow(this.arrows[key], fromNode, toNode);
+      } else {
+        // Criar nova seta
+        this.arrows[key] = this._createArrow(fromNode, toNode);
+      }
+    }
+
+    // Remover setas que não são mais necessárias
+    for (const key in this.arrows) {
+      if (!newArrowKeys[key]) {
+        this._removeArrow(this.arrows[key]);
+        delete this.arrows[key];
+      }
     }
   },
 
   limpar() {
     this.container.clear();
     this.nodes = [];
-    this.arrows = [];
+    this.arrows = {};
   },
 };
 
