@@ -1,3 +1,5 @@
+// src/pages/Page.js
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -20,14 +22,14 @@ const courier = Ubuntu_Mono({
   subsets: ["latin"],
 });
 
-const Page: React.FC = () => {
-  const [input, setInput] = useState<string>("");
-  const [valores, setValores] = useState<any[]>([]);
-  const [mensagem, setMensagem] = useState<string>("");
+const Page = () => {
+  const [input, setInput] = useState("");
+  const [valores, setValores] = useState([]);
+  const [mensagem, setMensagem] = useState("");
 
-  const svgContainerRef = useRef<HTMLDivElement>(null);
-  const svgRendererRef = useRef<typeof SvgRenderer | null>(null);
-  const listaRef = useRef<Ldse | null>(null);
+  const svgContainerRef = useRef(null);
+  const svgRendererRef = useRef(null);
+  const listaRef = useRef(null);
 
   useEffect(() => {
     if (svgContainerRef.current && !svgRendererRef.current) {
@@ -42,7 +44,7 @@ const Page: React.FC = () => {
     }
   }, []);
 
-  const handleExecute = () => {
+  const handleExecute = async () => {
     console.log("handleExecute chamado com input:", input);
 
     // Reiniciar a lista e o renderizador SVG
@@ -52,7 +54,7 @@ const Page: React.FC = () => {
     if (svgRendererRef.current) {
       svgRendererRef.current.limpar();
     }
-  
+
     if (!listaRef.current) {
       console.error("Lista não inicializada.");
       setMensagem("Erro: Lista não inicializada.");
@@ -71,10 +73,10 @@ const Page: React.FC = () => {
 
     try {
       const tree = parser.commands();
-      const visitor = new ListaVisitor(listaRef.current!);
-      visitor.visit(tree);
+      const visitor = new ListaVisitor(listaRef.current);
+      await visitor.visit(tree);
 
-      setValores(listaRef.current!.getValores());
+      setValores(listaRef.current.getValores());
       setMensagem("Comandos executados com sucesso!");
     } catch (e) {
       console.error(e);
@@ -84,9 +86,7 @@ const Page: React.FC = () => {
 
   return (
     <div className={poppins.className}>
-
       <TutorialModal />
-
 
       <div className="bg-white text-gray-200 p-6 relative">
         <div className="flex items-center justify-between mb-2">
@@ -94,7 +94,6 @@ const Page: React.FC = () => {
             <img src="/icon.png" alt="Logo" className="w-12 h-12" />
             <h1 className="text-2xl font-bold text-azul-logo">GraphList</h1>
           </div>
-         
         </div>
         <p className="text-gray-800 text-lg">
           Sua ferramenta para manipulação de listas encadeadas com visualização

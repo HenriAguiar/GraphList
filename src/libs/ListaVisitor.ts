@@ -1,3 +1,5 @@
+// src/libs/ListaVisitor.ts
+
 import {
   Inserir_inicioCommandContext,
   Inserir_fimCommandContext,
@@ -7,13 +9,17 @@ import {
   Remover_elementoCommandContext,
   Remover_posicaoCommandContext,
   ValorContext,
-  PosicaoContext,
+  CommandsContext,
+  CommandContext,
 } from '../parser/ListaComandosParser';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
+import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import Ldse from './Ldse';
 import { ListaComandosVisitor } from '../parser/ListaComandosVisitor';
-export default class ListaVisitor implements ListaComandosVisitor<void> {
+import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
+
+export default class ListaVisitor implements ListaComandosVisitor<Promise<void>> {
   private lista: Ldse;
 
   constructor(lista: Ldse) {
@@ -21,100 +27,93 @@ export default class ListaVisitor implements ListaComandosVisitor<void> {
     console.log('Visitor iniciado');
   }
 
-  // Implementação obrigatória do método visit
-  visit(tree: ParseTree): void {
-    tree.accept(this);
+  async visit(tree: ParseTree): Promise<void> {
+    await tree.accept(this);
   }
 
-  // Implementação obrigatória do método visitChildren
-  visitChildren(node: ParseTree): void {
+  async visitChildren(node: ParseTree): Promise<void> {
     for (let i = 0; i < node.childCount; i++) {
       const child = node.getChild(i);
       if (child) {
-        this.visit(child);
+        await child.accept(this);
       }
     }
   }
 
-  // Implementação obrigatória do método visitTerminal
-  visitTerminal(node: TerminalNode): void {
-    console.log('Visitando terminal:', node.text);
+  async visitCommands(ctx: CommandsContext): Promise<void> {
+    for (let i = 0; i < ctx.command().length; i++) {
+      const commandCtx = ctx.command(i);
+      await this.visit(commandCtx);
+      await this.delay(500);
+    }
   }
 
-  // Implementação obrigatória do método visitErrorNode
-  visitErrorNode(node: ParseTree): void {
-    console.error('Erro ao visitar nó:', node.text);
+  async visitCommand(ctx: CommandContext): Promise<void> {
+    await this.visitChildren(ctx);
   }
 
-  // Implementação dos métodos da gramática
-  visitInserir_inicioCommand(ctx: Inserir_inicioCommandContext): void {
-    console.log('Visitando inserir_inicioCommand');
+  async visitInserir_inicioCommand(ctx: Inserir_inicioCommandContext): Promise<void> {
     const valor = this.getValor(ctx.valor());
-    console.log(`Valor extraído: ${valor}`);
-    this.lista.inserir_inicio(valor);
+    await this.lista.inserir_inicio(valor);
   }
 
-  visitInserir_fimCommand(ctx: Inserir_fimCommandContext): void {
-    console.log('Visitando inserir_fimCommand');
+  async visitInserir_fimCommand(ctx: Inserir_fimCommandContext): Promise<void> {
     const valor = this.getValor(ctx.valor());
-    console.log(`Valor extraído: ${valor}`);
-    this.lista.inserir_fim(valor);
+    await this.lista.inserir_fim(valor);
   }
 
-  visitInserir_aposCommand(ctx: Inserir_aposCommandContext): void {
-    console.log('Visitando inserir_aposCommand');
+  async visitInserir_aposCommand(ctx: Inserir_aposCommandContext): Promise<void> {
     const valorPivo = this.getValor(ctx.valor(0));
     const valorNovo = this.getValor(ctx.valor(1));
-    console.log(`Valor pivo: ${valorPivo}, Valor novo: ${valorNovo}`);
-    this.lista.inserir_apos(valorPivo, valorNovo);
+    await this.lista.inserir_apos(valorPivo, valorNovo);
   }
 
-  visitRemover_inicioCommand(ctx: Remover_inicioCommandContext): void {
-    console.log('Visitando remover_inicioCommand');
-    this.lista.remover_inicio();
+  async visitRemover_inicioCommand(ctx: Remover_inicioCommandContext): Promise<void> {
+    await this.lista.remover_inicio();
   }
 
-  visitRemover_fimCommand(ctx: Remover_fimCommandContext): void {
-    console.log('Visitando remover_fimCommand');
-    this.lista.remover_fim();
+  async visitRemover_fimCommand(ctx: Remover_fimCommandContext): Promise<void> {
+    await this.lista.remover_fim();
   }
 
-  visitRemover_elementoCommand(ctx: Remover_elementoCommandContext): void {
-    console.log('Visitando remover_elementoCommand');
+  async visitRemover_elementoCommand(ctx: Remover_elementoCommandContext): Promise<void> {
     const valor = this.getValor(ctx.valor());
-    console.log(`Remover elemento: ${valor}`);
-    this.lista.remover_elemento(valor);
+    await this.lista.remover_elemento(valor);
   }
 
-  visitRemover_posicaoCommand(ctx: Remover_posicaoCommandContext): void {
-    console.log('Visitando remover_posicaoCommand');
+  async visitRemover_posicaoCommand(ctx: Remover_posicaoCommandContext): Promise<void> {
     const posicao = parseInt(ctx.posicao().text, 10);
-    console.log(`Remover posição: ${posicao}`);
-    this.lista.remover_posicao(posicao);
+    await this.lista.remover_posicao(posicao);
   }
 
-  // Método auxiliar para extrair valores
-  private getValor(ctx: ValorContext): any {
-    console.log('getValor chamado com ctx:', ctx);
+  delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
+  private getValor(ctx: ValorContext): any {
     if (!ctx) {
       console.error('Contexto inválido ou vazio.');
       return null;
     }
 
     if (ctx.IDENTIFIER()) {
-      console.log('Identificador encontrado:', ctx.IDENTIFIER()!.text);
       return ctx.IDENTIFIER()!.text;
     } else if (ctx.NUMBER()) {
-      console.log('Número encontrado:', ctx.NUMBER()!.text);
       return parseInt(ctx.NUMBER()!.text, 10);
     } else if (ctx.STRING()) {
       const text = ctx.STRING()!.text;
-      console.log('String encontrada:', text);
-      return text.substring(1, text.length - 1); // Remove as aspas
+      return text.substring(1, text.length - 1);
     }
 
     console.error('Nenhum valor correspondente encontrado no contexto.');
     return null;
+  }
+
+  async visitTerminal(node: TerminalNode): Promise<void> {
+    // Implementação vazia ou await alguma operação assíncrona se necessário
+  }
+
+  async visitErrorNode(node: ErrorNode): Promise<void> {
+    console.error('Erro ao visitar nó:', node.text);
   }
 }

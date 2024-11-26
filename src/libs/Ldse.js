@@ -1,276 +1,245 @@
 // src/libs/Ldse.js
 
 import Node from "./Node";
-import SvgRenderer from "./SvgRenderer.js"; // Certifique-se de que o caminho está correto
+import SvgRenderer from "./SvgRenderer.js";
 
 class Ldse {
-    /**
-     * Cria uma nova instância de Ldse.
-     * @param {typeof SvgRenderer} svgRenderer - Instância de SvgRenderer para atualizar a visualização SVG.
-     */
-    constructor(svgRenderer) {
-        this.prim = this.ult = null;
-        this.quant = 0;
-        this.svgRenderer = svgRenderer; // Armazena a instância de SvgRenderer
+  constructor(svgRenderer) {
+    this.prim = this.ult = null;
+    this.quant = 0;
+    this.svgRenderer = svgRenderer;
+  }
+
+  reset() {
+    this.prim = this.ult = null;
+    this.quant = 0;
+    Node.latestId = 1;
+  }
+
+  getValores() {
+    const valores = [];
+    let aux = this.prim;
+    while (aux !== null) {
+      valores.push(aux.info);
+      aux = aux.prox;
     }
-    reset() {
-        this.prim = this.ult = null;
-        this.quant = 0;
-        Node.latestId = 1;
+    return valores;
+  }
+
+  async inserir_inicio(valor) {
+    if (this.quant >= 8) {
+      console.warn("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
+      return;
+    }
+
+    console.log(`Método inserir_inicio chamado com valor: ${valor}`);
+    const novoNo = new Node(valor, this.prim);
+    this.prim = novoNo;
+
+    if (this.quant === 0) {
+      this.ult = this.prim;
+    }
+
+    this.quant += 1;
+    console.log(`Quantidade após inserir_inicio: ${this.quant}`);
+
+    await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+  }
+
+  async inserir_fim(valor) {
+    if (this.quant >= 8) {
+      console.warn("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
+      return;
+    }
+
+    console.log(`Método inserir_fim chamado com valor: ${valor}`);
+    if (this.quant === 0) {
+      this.prim = this.ult = new Node(valor, null);
+    } else {
+      this.ult.prox = new Node(valor, null);
+      this.ult = this.ult.prox;
+    }
+
+    this.quant += 1;
+    console.log(`Quantidade após inserir_fim: ${this.quant}`);
+
+    await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+  }
+
+  async remover_inicio() {
+    console.log(`Método remover_inicio chamado`);
+    if (!this.prim) {
+      console.warn("Lista vazia. Nenhum nó para remover.");
+      return;
+    }
+
+    const idRemovido = this.prim.id;
+
+    if (this.quant === 1) {
+      this.prim = null;
+      this.ult = null;
+    } else {
+      this.prim = this.prim.prox;
+    }
+
+    this.quant -= 1;
+    console.log("Quantidade após remover_inicio:", this.quant);
+
+    await this.svgRenderer.removerNo(idRemovido);
+    await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+  }
+
+  async remover_fim() {
+    console.log("Método remover_fim chamado");
+
+    if (!this.prim) {
+      console.warn("Lista vazia. Nenhum nó para remover.");
+      return;
+    }
+
+    let idRemovido;
+
+    if (this.quant === 1) {
+      idRemovido = this.prim.id;
+      this.prim = null;
+      this.ult = null;
+    } else {
+      let aux = this.prim;
+      while (aux.prox !== this.ult) {
+        aux = aux.prox;
       }
 
-    /**
-     * Obtém os valores atuais da lista encadeada.
-     * @returns {any[]} - Array contendo os valores dos nós.
-     */
-    getValores() {
-        const valores = [];
-        let aux = this.prim;
-        while (aux !== null) {
-            valores.push(aux.info);
-            aux = aux.prox;
-        }
-        console.log(this.getListaComIds());
-        console.log('abacate');
-        return valores;
+      idRemovido = this.ult.id;
+      aux.prox = null;
+      this.ult = aux;
     }
 
-    inserir_inicio(valor) {
-        if (this.quant >= 8) {
-            console.warn("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
-            return;
-        }
-    
-        console.log(`Método inserir_inicio chamado com valor: ${valor}`);
-        const novoNo = new Node(valor, this.prim); // Cria o novo nó apontando para o atual primeiro nó
-        this.prim = novoNo; // Atualiza o início da lista
-    
-        if (this.quant === 0) {
-            // Caso especial: lista estava vazia
-            this.ult = this.prim;
-        }
-    
-        this.quant += 1; // Incrementa a contagem de nós
-        console.log(`Quantidade após inserir_inicio: ${this.quant}`);
-    
-        // Atualiza visualização
-        this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-    }        
+    this.quant -= 1;
+    console.log("Quantidade após remover_fim:", this.quant);
 
-    inserir_fim(valor) {
-        if (this.quant >= 8) {
-            console.warn("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
-            return;
-        }
-    
-        console.log(`Método inserir_fim chamado com valor: ${valor}`);
-        if (this.quant === 0) {
-            this.prim = this.ult = new Node(valor, null);
-        } else {
-            this.ult.prox = new Node(valor, null);
-            this.ult = this.ult.prox;
-        }
-    
-        this.quant += 1;
-        console.log(`Quantidade após inserir_fim: ${this.quant}`);
-    
-        // Atualiza visualização
-        this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-    }    
+    await this.svgRenderer.removerNo(idRemovido);
+    await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+  }
 
-    remover_inicio() {
-        console.log(`Método remover_inicio chamado`);
-        if (!this.prim) {
-            console.warn("Lista vazia. Nenhum nó para remover.");
-            return;
-        }
-    
-        const idRemovido = this.prim.id;
-    
-        if (this.quant === 1) {
-            // Caso especial: apenas um nó na lista
-            this.prim = null;
-            this.ult = null;
-        } else {
-            // Avança para o próximo nó
-            this.prim = this.prim.prox;
-        }
-    
-        this.quant -= 1;
-        console.log("Quantidade após remover_inicio:", this.quant);
-    
-        // Atualiza visualização
-        this.svgRenderer.removerNo(idRemovido);
-        this.svgRenderer._rebuildArrows();
-    }    
-    
-    remover_fim() {
-        console.log("Método remover_fim chamado");
-
-        if (this.quant === 1) {
-            // Apenas um nó, muda sua cor e não remove.
-            this.svgRenderer.mudarCorNo(this.prim.id);
-        } else {
-            let aux = this.prim;
-            while (aux.prox !== this.ult) {
-                aux = aux.prox; // Penúltimo nó
-            }
-
-            // Mude a cor do último nó
-            this.svgRenderer.mudarCorNo(this.ult.id);
-
-            // Atualize o último nó na lista
-            this.ult = aux;
-            this.ult.prox = null; // Remove a referência ao nó "removido" para parar as setas
-        }
-
-        this.quant -= 1; // Atualiza a quantidade, mas o nó permanece na lista.
-        console.log("Quantidade após remover_fim:", this.quant);
-        this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+  async remover_elemento(valor) {
+    console.log(`Método remover_elemento chamado com valor: ${valor}`);
+    if (!this.prim) {
+      console.warn("Lista vazia. Nenhum elemento para remover.");
+      return;
     }
 
-    remover_elemento(valor) {
-        console.log(`Método remover_elemento chamado com valor: ${valor}`);
-        if (!this.prim) {
-            console.warn("Lista vazia. Nenhum elemento para remover.");
-            return;
-        }
-    
-        let ant = null;
-        let aux = this.prim;
-    
-        while (aux !== null) {
-            if (aux.info === valor) {
-                console.log(`Removendo elemento com valor: ${valor}`);
-    
-                // Atualizar referências lógicas
-                if (ant === null) {
-                    // Caso especial: removendo o primeiro nó
-                    this.prim = aux.prox;
-                } else {
-                    ant.prox = aux.prox;
-                }
-    
-                if (aux === this.ult) {
-                    // Caso especial: removendo o último nó
-                    this.ult = ant;
-                }
-    
-                this.quant -= 1;
-    
-                // Atualizar visualização
-                this.svgRenderer.removerNo(aux.id); // Remove o nó e as setas que apontam para ele
-                return;
-            }
-    
-            ant = aux;
-            aux = aux.prox;
-        }
-    
-        console.warn(`Elemento com valor=${valor} não encontrado.`);
-    }    
-        
-    inserir_apos(valorPivo, valor) {
-        console.log(`Método inserir_apos chamado com valorPivo: ${valorPivo}, valorNovo: ${valor}`);
-        let no_primeiro = this.prim;
-        let index = 0;
-        while (no_primeiro !== null) {
-            if (no_primeiro.info === valorPivo) {
-                no_primeiro.prox = new Node(valor, no_primeiro.prox);
-                this.quant += 1;
-                if (no_primeiro === this.ult) {
-                    this.ult = no_primeiro.prox;
-                }
-                this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-                console.log(`Quantidade após inserir_apos: ${this.quant}`);
-                return;
-            }
-            no_primeiro = no_primeiro.prox;
-            index++;
-        }
-    }
+    let ant = null;
+    let aux = this.prim;
 
-    remover_posicao(posicao) {
-        console.log(`Método remover_posicao chamado com posicao: ${posicao}`);
-    
-        if (posicao >= this.quant || posicao < 0) {
-            console.warn(`Posição inválida: ${posicao}`);
-            return;
-        }
-    
-        let ant = null;
-        let aux = this.prim;
-        let i = 0;
-    
-        while (i !== posicao) {
-            ant = aux;
-            aux = aux.prox;
-            i++;
-        }
-    
-        console.log(`Removendo nó na posição ${posicao} com valor ${aux.info}`);
-    
-        // Atualiza referências
+    while (aux !== null) {
+      if (aux.info === valor) {
+        console.log(`Removendo elemento com valor: ${valor}`);
+
+        const idRemovido = aux.id;
+
         if (ant === null) {
-            // Caso especial: removendo o primeiro nó
-            this.prim = aux.prox;
+          this.prim = aux.prox;
         } else {
-            ant.prox = aux.prox;
+          ant.prox = aux.prox;
         }
-    
+
         if (aux === this.ult) {
-            // Caso especial: removendo o último nó
-            this.ult = ant;
+          this.ult = ant;
         }
-    
+
         this.quant -= 1;
-    
-        // Atualizar visualização
-        this.svgRenderer.removerNo(aux.id); // Remove o nó e as setas que apontam para ele
-    }    
-        
-    toArray() {
-        const resultado = [];
-        let atual = this.prim;
-        while (atual) {
-            resultado.push(atual.info);
-            atual = atual.prox;
-        }
-        return resultado;
+
+        await this.svgRenderer.removerNo(idRemovido);
+        await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+        return;
+      }
+
+      ant = aux;
+      aux = aux.prox;
     }
 
-    /**
-     * Obtém a lista atual com IDs, valores e posições dos nós.
-     * @returns {Array<{id: number, valor: any, x: number, y: number}>} - Lista dos nós com IDs, valores e posições.
-     */
-    getListaComIds() {
-        const lista = [];
-        let aux = this.prim;
-        let index = 0;
-        const startX = 50; // Posição inicial no eixo X
-        const spacing = 120; // Espaçamento entre os nós
-        const y = 100; // Posição constante no eixo Y
+    console.warn(`Elemento com valor=${valor} não encontrado.`);
+  }
 
-        while (aux !== null) {
-            const x = index * spacing + startX;
-            lista.push({ id: aux.id, valor: aux.info, x, y });
-            aux = aux.prox;
-            index++;
-        }
-        console.log("Lista com IDs:", lista);
-        return lista;
+  async remover_posicao(posicao) {
+    console.log(`Método remover_posicao chamado com posicao: ${posicao}`);
+
+    if (posicao >= this.quant || posicao < 0) {
+      console.warn(`Posição inválida: ${posicao}`);
+      return;
     }
 
-    /**
-     * Exibe os valores da lista no console.
-     */
-    show() {
-        let aux = this.prim;
-        for (let i = 0; i < this.quant; i++) {
-            console.log(aux.info);
-            aux = aux.prox;
-        }
+    let ant = null;
+    let aux = this.prim;
+    let i = 0;
+
+    while (i !== posicao) {
+      ant = aux;
+      aux = aux.prox;
+      i++;
     }
+
+    console.log(`Removendo nó na posição ${posicao} com valor ${aux.info}`);
+
+    const idRemovido = aux.id;
+
+    if (ant === null) {
+      this.prim = aux.prox;
+    } else {
+      ant.prox = aux.prox;
+    }
+
+    if (aux === this.ult) {
+      this.ult = ant;
+    }
+
+    this.quant -= 1;
+
+    await this.svgRenderer.removerNo(idRemovido);
+    await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+  }
+
+  async inserir_apos(valorPivo, valor) {
+    console.log(`Método inserir_apos chamado com valorPivo: ${valorPivo}, valorNovo: ${valor}`);
+    let aux = this.prim;
+
+    while (aux !== null) {
+      if (aux.info === valorPivo) {
+        const novoNo = new Node(valor, aux.prox);
+        aux.prox = novoNo;
+
+        if (aux === this.ult) {
+          this.ult = novoNo;
+        }
+
+        this.quant += 1;
+        console.log(`Quantidade após inserir_apos: ${this.quant}`);
+
+        await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
+        return;
+      }
+      aux = aux.prox;
+    }
+
+    console.warn(`Elemento com valor=${valorPivo} não encontrado.`);
+  }
+
+  getListaComIds() {
+    const lista = [];
+    let aux = this.prim;
+    let index = 0;
+    const startX = 50;
+    const spacing = 120;
+    const y = 100;
+
+    while (aux !== null) {
+      const x = index * spacing + startX;
+      lista.push({ id: aux.id, valor: aux.info, x, y });
+      aux = aux.prox;
+      index++;
+    }
+    return lista;
+  }
 }
 
 export default Ldse;
