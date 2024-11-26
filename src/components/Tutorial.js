@@ -16,7 +16,7 @@ export default function TutorialModal() {
     {
       message: (
         <div>
-          <h4 className="text-2xl font-bold text-blue-500 mb-2">Bem-vindo ao GraphList!</h4>
+          <h4 className="text-2xl font-bold text-azul-logo mb-2">Bem-vindo ao GraphList!</h4>
           <p className="text-gray-300 mb-4">
             Este é o passo inicial do tutorial. Aqui você aprenderá a manipular listas encadeadas com
             visualização gráfica.
@@ -32,7 +32,7 @@ export default function TutorialModal() {
     {
       message: (
         <div>
-          <h4 className="text-2xl font-bold text-blue-500 mb-2">Adicionando Nós à Lista</h4>
+          <h4 className="text-2xl font-bold text-azul-logo mb-2">Adicionando Nós à Lista</h4>
           <p className="text-gray-300 mb-4">
             Para adicionar nós, utilize comandos como <span className="text-green-500">inserir_inicio</span> ou{" "}
             <span className="text-green-500">inserir_fim</span>. Veja um exemplo:
@@ -46,7 +46,7 @@ export default function TutorialModal() {
     {
       message: (
         <div>
-          <h4 className="text-2xl font-bold text-blue-500 mb-2">Removendo Nós da Lista</h4>
+          <h4 className="text-2xl font-bold text-azul-logo mb-2">Removendo Nós da Lista</h4>
           <p className="text-gray-300 mb-4">
             Para remover nós, utilize comandos como <span className="text-red-500">remover_inicio</span> ou{" "}
             <span className="text-red-500">remover_fim</span>. Veja um exemplo:
@@ -60,7 +60,7 @@ export default function TutorialModal() {
     {
       message: (
         <div>
-          <h4 className="text-2xl font-bold text-blue-500 mb-2">Visualizando a Lista</h4>
+          <h4 className="text-2xl font-bold text-azul-logo mb-2">Visualizando a Lista</h4>
           <p className="text-gray-300 mb-4">
             Toda modificação na lista é refletida na visualização dinâmica abaixo do editor. Explore como os
             nós são adicionados e removidos em tempo real!
@@ -71,7 +71,7 @@ export default function TutorialModal() {
     {
       message: (
         <div>
-          <h4 className="text-2xl font-bold text-blue-500 mb-2">Parabéns!</h4>
+          <h4 className="text-2xl font-bold text-azul-logo mb-2">Parabéns!</h4>
           <p className="text-gray-300 mb-4">
             Você completou o tutorial! Agora pode explorar o aplicativo por conta própria e criar listas
             incríveis.
@@ -108,7 +108,7 @@ export default function TutorialModal() {
             Voltar
           </button>
           <button
-            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-300 ${
+            className={`px-4 py-2 rounded-lg font-medium text-sm bg-azul-very transition-colors duration-300 ${
               step === stepsContent.length
                 ? "bg-gray-600 text-gray-400 cursor-not-allowed"
                 : "bg-blue-500 text-white hover:bg-blue-600"
@@ -124,7 +124,7 @@ export default function TutorialModal() {
       {/* Botão para reabrir o tutorial */}
       {!show && (
        <button
-className="absolute top-4 right-10 bg-transparent text-azul-logo px-4 py-2 rounded-full hover:text-gray-400 z-10 transition duration-300"
+className="absolute top-4 right-10 bg-transparent text-azul-very px-4 py-2 rounded-full hover:text-gray-400 z-10 transition duration-300"
        onClick={() => setShow(true)}
      >
        <QuestionMarkCircleIcon className="w-8 h-8" />

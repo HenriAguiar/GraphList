@@ -10,7 +10,8 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        'azul-logo': '#07c6ff'
+        'azul-logo': '#07c6ff',
+        'azul-very':'#00568c'
       },
     },
   },
