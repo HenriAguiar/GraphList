@@ -44,6 +44,15 @@ const Page: React.FC = () => {
 
   const handleExecute = () => {
     console.log("handleExecute chamado com input:", input);
+
+    // Reiniciar a lista e o renderizador SVG
+    if (listaRef.current) {
+      listaRef.current = new Ldse(svgRendererRef.current);
+    }
+    if (svgRendererRef.current) {
+      svgRendererRef.current.limpar();
+    }
+  
     if (!listaRef.current) {
       console.error("Lista não inicializada.");
       setMensagem("Erro: Lista não inicializada.");

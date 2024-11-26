@@ -13,6 +13,11 @@ class Ldse {
         this.quant = 0;
         this.svgRenderer = svgRenderer; // Armazena a instância de SvgRenderer
     }
+    reset() {
+        this.prim = this.ult = null;
+        this.quant = 0;
+        Node.latestId = 1;
+      }
 
     /**
      * Obtém os valores atuais da lista encadeada.
