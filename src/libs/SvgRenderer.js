@@ -8,14 +8,12 @@ const SvgRenderer = {
   arrows: [],
 
   init(containerId) {
-    console.log(`SvgRenderer inicializado no contêiner: ${containerId}`);
     this.container = SVG().addTo(`#${containerId}`).size('100%', '100%');
     this.nodes = [];
     this.arrows = [];
   },
 
   criarNo({ id, valor, x, y }) {
-    console.log(`Criando nó: id=${id}, valor=${valor}, x=${x}, y=${y}`);
     const radius = 25;
     const startX = x - 100;
 
@@ -48,7 +46,6 @@ const SvgRenderer = {
 
   atualizarPosicoes(listaComIds) {
     return new Promise(resolve => {
-      console.log("Atualizando posições com a lista:", listaComIds);
 
       const existingNodesMap = {};
       this.nodes.forEach(node => {
@@ -89,7 +86,6 @@ const SvgRenderer = {
 
   removerNo(id) {
     return new Promise(resolve => {
-      console.log(`Removendo nó com id=${id}`);
       const nodeIndex = this.nodes.findIndex(node => node.id === id);
 
       if (nodeIndex !== -1) {
@@ -122,7 +118,6 @@ const SvgRenderer = {
           resolve();
         });
       } else {
-        console.warn(`Nó com id=${id} não encontrado.`);
         resolve();
       }
     });
@@ -133,7 +128,6 @@ const SvgRenderer = {
   },
 
   _createArrow(fromNode, toNode) {
-    console.log(`Criando seta entre id=${fromNode.id} e id=${toNode.id}`);
 
     const fromX = fromNode.x + 50;
     const fromY = fromNode.y + 25;
@@ -153,7 +147,6 @@ const SvgRenderer = {
   },
 
   _rebuildArrows() {
-    console.log("Recriando todas as setas.");
 
     this.arrows.forEach((arrowObj) => {
       arrowObj.arrow.remove();
@@ -167,7 +160,6 @@ const SvgRenderer = {
   },
 
   limpar() {
-    console.log("Limpando SVG.");
     this.container.clear();
     this.nodes = [];
     this.arrows = [];
