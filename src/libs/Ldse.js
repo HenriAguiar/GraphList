@@ -1,13 +1,13 @@
 // src/libs/Ldse.js
 
 import Node from "./Node";
-import SvgRenderer from "./SvgRenderer.js";
 
 class Ldse {
   constructor(svgRenderer) {
     this.prim = this.ult = null;
     this.quant = 0;
     this.svgRenderer = svgRenderer;
+    this.MAX_NODES = 8; // Definindo o limite máximo de nós
   }
 
   reset() {
@@ -27,8 +27,8 @@ class Ldse {
   }
 
   async inserir_inicio(valor) {
-    if (this.quant >= 8) {
-      console.warn("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
+    if (this.quant >= this.MAX_NODES) {
+      console.error("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
       return;
     }
 
@@ -47,8 +47,8 @@ class Ldse {
   }
 
   async inserir_fim(valor) {
-    if (this.quant >= 8) {
-      console.warn("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
+    if (this.quant >= this.MAX_NODES) {
+      console.error("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
       return;
     }
 
@@ -69,7 +69,7 @@ class Ldse {
   async remover_inicio() {
     console.log(`Método remover_inicio chamado`);
     if (!this.prim) {
-      console.warn("Lista vazia. Nenhum nó para remover.");
+      console.error("Lista vazia. Nenhum nó para remover.");
       return;
     }
 
@@ -93,7 +93,7 @@ class Ldse {
     console.log("Método remover_fim chamado");
 
     if (!this.prim) {
-      console.warn("Lista vazia. Nenhum nó para remover.");
+      console.error("Lista vazia. Nenhum nó para remover.");
       return;
     }
 
@@ -105,13 +105,15 @@ class Ldse {
       this.ult = null;
     } else {
       let aux = this.prim;
-      while (aux.prox !== this.ult) {
+      let ant = null;
+      while (aux.prox !== null) {
+        ant = aux;
         aux = aux.prox;
       }
 
-      idRemovido = this.ult.id;
-      aux.prox = null;
-      this.ult = aux;
+      idRemovido = aux.id;
+      ant.prox = null;
+      this.ult = ant;
     }
 
     this.quant -= 1;
@@ -124,12 +126,13 @@ class Ldse {
   async remover_elemento(valor) {
     console.log(`Método remover_elemento chamado com valor: ${valor}`);
     if (!this.prim) {
-      console.warn("Lista vazia. Nenhum elemento para remover.");
+      console.error("Lista vazia. Nenhum elemento para remover.");
       return;
     }
 
     let ant = null;
     let aux = this.prim;
+    let encontrado = false;
 
     while (aux !== null) {
       if (aux.info === valor) {
@@ -151,21 +154,24 @@ class Ldse {
 
         await this.svgRenderer.removerNo(idRemovido);
         await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-        return;
+        encontrado = true;
+        break;
       }
 
       ant = aux;
       aux = aux.prox;
     }
 
-    console.warn(`Elemento com valor=${valor} não encontrado.`);
+    if (!encontrado) {
+      console.error(`Elemento com valor=${valor} não encontrado.`);
+    }
   }
 
   async remover_posicao(posicao) {
     console.log(`Método remover_posicao chamado com posicao: ${posicao}`);
 
     if (posicao >= this.quant || posicao < 0) {
-      console.warn(`Posição inválida: ${posicao}`);
+      console.error(`Posição inválida: ${posicao}`);
       return;
     }
 
@@ -200,8 +206,14 @@ class Ldse {
   }
 
   async inserir_apos(valorPivo, valor) {
+    if (this.quant >= this.MAX_NODES) {
+      console.error("Limite de 8 nós atingido. Não é possível adicionar mais nós.");
+      return;
+    }
+
     console.log(`Método inserir_apos chamado com valorPivo: ${valorPivo}, valorNovo: ${valor}`);
     let aux = this.prim;
+    let encontrado = false;
 
     while (aux !== null) {
       if (aux.info === valorPivo) {
@@ -216,12 +228,15 @@ class Ldse {
         console.log(`Quantidade após inserir_apos: ${this.quant}`);
 
         await this.svgRenderer.atualizarPosicoes(this.getListaComIds());
-        return;
+        encontrado = true;
+        break;
       }
       aux = aux.prox;
     }
 
-    console.warn(`Elemento com valor=${valorPivo} não encontrado.`);
+    if (!encontrado) {
+      console.error(`Elemento com valor=${valorPivo} não encontrado.`);
+    }
   }
 
   getListaComIds() {
