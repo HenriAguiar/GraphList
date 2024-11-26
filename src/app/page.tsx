@@ -6,13 +6,12 @@ import { ListaComandosLexer } from "../parser/ListaComandosLexer";
 import { ListaComandosParser } from "../parser/ListaComandosParser";
 import MyErrorListener from "../libs/ErrorListener";
 import TutorialModal from "../components/Tutorial";
-import Download from "../components/Donwload";
+import Download from "../components/Download";
 import Ldse from "../libs/Ldse.js";
 import SvgRenderer from "../libs/SvgRenderer.js";
 import ListaVisitor from "../libs/ListaVisitor";
 import { Poppins, Ubuntu_Mono } from "next/font/google";
 import CustomEditor from "../components/Editor";
-
 
 const poppins = Poppins({
   weight: ["400", "600", "700"],
@@ -26,8 +25,9 @@ const courier = Ubuntu_Mono({
 const Page: React.FC = () => {
   const [input, setInput] = useState<string>("");
   const [valores, setValores] = useState<any[]>([]);
-  const [comandos, setComandos] = useState<string[]>([]); // Array para armazenar comandos
+  const [comandos, setComandos] = useState<string[]>([]);
   const [mensagem, setMensagem] = useState<string>("");
+  const [logs, setLogs] = useState<string[]>([]);
 
   const svgContainerRef = useRef(null);
   const svgRendererRef = useRef(null);
@@ -46,41 +46,68 @@ const Page: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
+
+    console.log = (...args) => {
+      setLogs((prevLogs) => [...prevLogs, `[LOG]: ${args.join(" ")}`]);
+      originalConsoleLog(...args);
+    };
+
+    console.error = (...args) => {
+      setLogs((prevLogs) => [...prevLogs, `[ERROR]: ${args.join(" ")}`]);
+      originalConsoleError(...args);
+    };
+
+    return () => {
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+    };
+  }, []);
+
   const handleExecute = async () => {
     console.log("handleExecute chamado com input:", input);
-
-    // Reiniciar a lista e o renderizador SVG
+  
     if (listaRef.current) {
       listaRef.current = new Ldse(svgRendererRef.current);
     }
     if (svgRendererRef.current) {
       svgRendererRef.current.limpar();
     }
-
+  
     if (!listaRef.current) {
       console.error("Lista não inicializada.");
       setMensagem("Erro: Lista não inicializada.");
       return;
     }
-
-    // Adiciona o comando atual ao array
+  
     setComandos((prevComandos) => [...prevComandos, input]);
-
+  
     const chars = new ANTLRInputStream(input);
     const lexer = new ListaComandosLexer(chars);
     const tokens = new CommonTokenStream(lexer);
     tokens.fill();
-
+  
     const parser = new ListaComandosParser(tokens);
     parser.buildParseTree = true;
+  
+    const errorListener = new MyErrorListener();
     parser.removeErrorListeners();
-    parser.addErrorListener(new MyErrorListener());
-
+    parser.addErrorListener(errorListener);
+  
     try {
       const tree = parser.commands();
+  
+      // Verifique se ocorreu algum erro de sintaxe
+      if (errorListener.hasError) {
+        setMensagem("Erro de sintaxe detectado. Comandos não executados.");
+        return; // Interrompe a execução se houve erro
+      }
+  
       const visitor = new ListaVisitor(listaRef.current);
       await visitor.visit(tree);
-
+  
       setValores(listaRef.current.getValores());
       setMensagem("Comandos executados com sucesso!");
     } catch (e) {
@@ -92,7 +119,6 @@ const Page: React.FC = () => {
   return (
     <div className={poppins.className}>
       <TutorialModal />
-
       <div className="bg-white text-gray-200 pt-3 relative pl-6">
         <div className="flex items-center">
           <img src="/icon.png" alt="Logo" className="w-9 h-9 mr-3" />
@@ -117,8 +143,8 @@ const Page: React.FC = () => {
               </div>
               <div className="h-48">
                 <CustomEditor
-                  value={input} // Passa o estado para o Editor
-                  onChange={(value) => setInput(value)} // Atualiza o estado com o valor do editor
+                  value={input}
+                  onChange={(value) => setInput(value)}
                 />
               </div>
               <button
@@ -129,8 +155,7 @@ const Page: React.FC = () => {
               </button>
             </div>
           </div>
-
-          <div className="flex-1 ">
+          <div className="flex-1">
             <div className="bg-gray-900 text-gray-200 p-4 rounded-lg h-[316px]">
               <h5 className="text-lg font-bold mb-3 text-white">
                 Situação da Lista
@@ -152,8 +177,9 @@ const Page: React.FC = () => {
 
         <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <h5 className="text-lg font-bold text-white">Visualização da Lista</h5>
-            {/* Ícone de Salvar SVG */}
+            <h5 className="text-lg font-bold text-white">
+              Visualização da Lista
+            </h5>
             <Download
               comandos={[]}
               valores={[]}
@@ -166,6 +192,22 @@ const Page: React.FC = () => {
             ref={svgContainerRef}
             className="w-full h-64 bg-gray-800 border border-gray-600 rounded-lg"
           ></div>
+        </div>
+
+        <div className="w-full bg-gray-900 text-gray-200 p-4 rounded-lg">
+          <h5 className="text-lg font-bold text-white mb-3">Console</h5>
+          <div className="h-48 overflow-y-auto bg-gray-800 border border-gray-600 rounded-lg p-2">
+            {logs.map((log, index) => (
+              <div
+                key={index}
+                className={`text-sm ${
+                  log.startsWith("[ERROR]:") ? "text-red-500" : "text-green-500"
+                }`}
+              >
+                {log}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
